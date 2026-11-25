@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>مدیریت انجمن</title>
+
+<style>
+body{
+margin:0;
+background:#06111e;
+color:white;
+font-family:Tahoma;
+display:grid;
+place-items:center;
+min-height:100vh;
+}
+
+.box{
+width:min(90%,380px);
+padding:30px;
+background:#0c1e31;
+border:1px solid #1b4d70;
+border-radius:16px;
+text-align:center;
+}
+
+h2{color:#55ddff}
+
+input{
+width:90%;
+padding:13px;
+margin:10px 0;
+background:#061321;
+border:1px solid #24577b;
+border-radius:8px;
+color:white;
+}
+
+button{
+width:100%;
+padding:13px;
+background:#087fca;
+color:white;
+border:0;
+border-radius:8px;
+cursor:pointer;
+}
+
+#msg{color:#ff9a9a}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>پنل مدیریت رباتیک</h2>
+
+<input id="username" placeholder="نام کاربری">
+
+<input id="password" type="password"
+placeholder="رمز عبور">
+
+<button onclick="login()">ورود</button>
+
+<p id="msg"></p>
+
+</div>
+
+<script>
+
+function login(){
+
+const username =
+document.getElementById('username').value;
+
+const password =
+document.getElementById('password').value;
+
+const msg = document.getElementById('msg');
+
+msg.textContent='در حال بررسی...';
+
+google.script.run
+
+.withSuccessHandler(function(token){
+
+sessionStorage.setItem('adminToken',token);
+
+window.top.location.href =
+'<?= appUrl ?>?page=dashboard';
+
+})
+
+.withFailureHandler(function(error){
+
+msg.textContent=error.message;
+
+})
+
+.loginAdmin(username,password);
+
+}
+
+</script>
+
+</body>
+</html>

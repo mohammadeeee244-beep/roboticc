@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>انجمن علمی رباتیک</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+margin:0;
+background:#06111e;
+color:#fff;
+font-family:Tahoma;
+}
+
+.container{
+max-width:650px;
+margin:35px auto;
+padding:25px;
+background:#0c1e31;
+border:1px solid #1b4d70;
+border-radius:18px;
+}
+
+h1{
+text-align:center;
+color:#55ddff;
+}
+
+p{text-align:center;color:#b8d9eb}
+
+input{
+width:100%;
+padding:14px;
+margin:8px 0;
+background:#061321;
+border:1px solid #24577b;
+border-radius:8px;
+color:white;
+font-size:15px;
+}
+
+button{
+width:100%;
+padding:14px;
+margin-top:12px;
+border:0;
+border-radius:8px;
+background:#087fca;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+button:disabled{opacity:.6}
+
+.qr{
+text-align:center;
+margin-top:30px;
+}
+
+.qr img{
+width:220px;
+background:white;
+padding:10px;
+border-radius:12px;
+}
+
+#formMessage{
+text-align:center;
+margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>انجمن علمی رباتیک</h1>
+
+<p>دانشگاه ولیعصر رفسنجان</p>
+
+<form id="registrationForm">
+
+<input name="firstName" placeholder="نام" required>
+
+<input name="lastName" placeholder="نام خانوادگی" required>
+
+<input name="phone" placeholder="شماره موبایل" type="tel"
+pattern="09[0-9]{9}" required>
+
+<input name="studentId" placeholder="شماره دانشجویی" required>
+
+<input name="major" placeholder="رشته تحصیلی" required>
+
+<button id="submitBtn" type="submit">
+ثبت اطلاعات
+</button>
+
+</form>
+
+<div id="formMessage"></div>
+
+<div class="qr">
+<h3>QR CODE</h3>
+<img id="qr" alt="Registration QR Code">
+<p id="targetAddress"></p>
+</div>
+
+</div>
+
+<script>
+
+// آدرس واقعی Web App خودت را اینجا قرار بده
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxUkefFq4AK-kpnABgAKeJwyz1RrXnEDE5baKDJoiwZ8p2c5r5JinDQQU3raVfdomTjvQ/exec";
+
+// آدرس سایت GitHub
+const githubUrl =
+"https://mohammadeeee244-beep.github.io/roboticc/";
+
+// ساخت QR Code
+document.getElementById('qr').src =
+'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' +
+encodeURIComponent(githubUrl);
+
+document.getElementById('targetAddress').textContent =
+githubUrl;
+
+// ارسال فرم
+document.getElementById('registrationForm')
+.addEventListener('submit', async function(event){
+
+event.preventDefault();
+
+const form = event.currentTarget;
+
+if(!form.reportValidity()) return;
+
+const data = {
+firstName:form.firstName.value.trim(),
+lastName:form.lastName.value.trim(),
+phone:form.phone.value.trim(),
+studentId:form.studentId.value.trim(),
+major:form.major.value.trim()
+};
+
+const button = document.getElementById('submitBtn');
+const message = document.getElementById('formMessage');
+
+button.disabled = true;
+button.textContent = 'در حال ارسال...';
+
+message.textContent = '';
+
+try{
+
+await fetch(WEB_APP_URL,{
+method:'POST',
+mode:'no-cors',
+headers:{
+'Content-Type':'text/plain;charset=utf-8'
+},
+body:JSON.stringify(data)
+});
+
+message.textContent =
+'درخواست ارسال شد. ثبت نهایی را در پنل مدیریت بررسی کنید.';
+
+message.style.color='#72f0b0';
+
+form.reset();
+
+}catch(error){
+
+message.textContent='ارسال اطلاعات با خطا مواجه شد.';
+message.style.color='#ff9a9a';
+
+}finally{
+
+button.disabled=false;
+button.textContent='ثبت اطلاعات';
+
+}
+
+});
+
+</script>
+
+</body>
+</html>
