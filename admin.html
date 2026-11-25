@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ورود مدیر</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#050d19;color:#fff;font-family:Tahoma}
+.box{width:min(92%,390px);background:#0c1d30;border:1px solid #17608b;border-radius:20px;padding:30px;box-shadow:0 0 45px #008cff33;text-align:center}
+h2{color:#45dfff}input{width:100%;padding:14px;margin:9px 0;background:#061321;border:1px solid #24577b;border-radius:9px;color:#fff}
+button{width:100%;padding:14px;border:0;border-radius:9px;background:#078bd5;color:white;font-weight:bold;cursor:pointer;margin-top:10px}
+a{color:#8ddfff}#msg{color:#ff9a9a;min-height:24px}
+</style></head><body><div class="box">
+<h2>ورود به پنل مدیریت</h2><p>انجمن علمی رباتیک دانشگاه ولی عصر</p>
+<form id="loginForm"><input id="username" placeholder="نام کاربری" autocomplete="username" required>
+<input id="password" type="password" placeholder="رمز عبور" autocomplete="current-password" required>
+<button id="loginBtn">ورود</button></form><p id="msg"></p><a href="<?= appUrl ?>">بازگشت به سایت</a>
+</div>
+<script>
+document.getElementById("loginForm").addEventListener("submit",e=>{
+ e.preventDefault(); const msg=document.getElementById("msg"),btn=document.getElementById("loginBtn");btn.disabled=true;msg.textContent="در حال بررسی...";
+ google.script.run.withSuccessHandler(r=>{
+  if(r.success){sessionStorage.setItem("adminToken",r.token);window.top.location.href="<?= appUrl ?>?page=dashboard";}
+  else{msg.textContent=r.message;btn.disabled=false;}
+ }).withFailureHandler(err=>{msg.textContent=err.message||"خطا";btn.disabled=false;})
+ .loginAdmin(document.getElementById("username").value,document.getElementById("password").value);
+});
+</script></body></html>

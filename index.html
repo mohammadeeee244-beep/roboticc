@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>انجمن علمی رباتیک دانشگاه ولی عصر</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;font-family:Tahoma,Arial;background:radial-gradient(circle at 15% 10%,#12375b 0,transparent 32%),#050d19;color:#eef8ff}
+    .wrap{max-width:1100px;margin:auto;padding:24px}.nav{display:flex;justify-content:space-between;align-items:center;gap:16px}
+    .brand{font-weight:bold;color:#5ee7ff;font-size:18px}.pill{color:#b8d8ed;text-decoration:none;border:1px solid #24547a;padding:10px 15px;border-radius:30px}
+    .hero{padding:55px 0 30px;display:grid;grid-template-columns:1.2fr .8fr;gap:25px;align-items:center}
+    h1{font-size:clamp(32px,5vw,58px);line-height:1.5;margin:0;color:#fff;text-shadow:0 0 22px #008cff}
+    .sub{color:#9fc6df;line-height:2}.orb{height:230px;border:1px solid #1686c8;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle,#0d4970,#071525 65%);box-shadow:0 0 55px #0077bb66}
+    .robot{font-size:100px;filter:drop-shadow(0 0 18px #00cfff)}
+    .card{background:#0b1b2d;border:1px solid #17466b;border-radius:20px;padding:26px;box-shadow:0 15px 50px #0008;margin:20px 0}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}label{display:block;color:#b9d8eb;font-size:13px;margin-bottom:7px}
+    input{width:100%;padding:14px;border-radius:10px;border:1px solid #24577b;background:#061321;color:white;outline:none}
+    input:focus{border-color:#24cfff;box-shadow:0 0 0 3px #00bfff22}.full{grid-column:1/-1}
+    button{border:0;border-radius:10px;padding:14px 20px;background:linear-gradient(90deg,#0879d1,#08c4e8);color:white;font-weight:bold;cursor:pointer;width:100%;margin-top:15px}
+    #status{min-height:24px;color:#71e8b2}.qr{text-align:center}.qr img{width:150px;background:white;padding:8px;border-radius:12px}
+    footer{text-align:center;color:#7798b1;padding:25px;font-size:12px}
+    @media(max-width:700px){.hero{grid-template-columns:1fr;padding-top:30px}.orb{height:170px}.grid{grid-template-columns:1fr}.full{grid-column:auto}.nav{align-items:flex-start;flex-direction:column}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav"><div class="brand">🤖 انجمن علمی رباتیک</div><a class="pill" href="<?= appUrl ?>?page=admin">ورود مدیر</a></div>
+  <section class="hero">
+    <div><h1>آینده را<br>هوشمندانه بسازیم</h1><p class="sub">انجمن علمی رباتیک دانشگاه ولی عصر (عج) رفسنجان<br>برای عضویت در انجمن، فرم زیر را تکمیل کنید.</p></div>
+   <div class="orb">
+    <img src="hk.jpg" alt="لوگوی انجمن رباتیک"
+         style="width:180px;height:180px;object-fit:contain;border-radius:50%;">
+</div>
+  </section>
+  <section class="card">
+    <h2>فرم عضویت در انجمن</h2>
+    <form id="joinForm">
+      <div class="grid">
+        <div><label>نام</label><input name="firstName" required></div>
+        <div><label>نام خانوادگی</label><input name="lastName" required></div>
+        <div><label>شماره همراه</label><input name="phone" inputmode="numeric" pattern="09[0-9]{9}" placeholder="09123456789" required></div>
+        <div><label>شماره دانشجویی</label><input name="studentId" required></div>
+        <div class="full"><label>رشته تحصیلی</label><input name="major" required></div>
+      </div>
+      <button type="submit" id="submitBtn">ثبت درخواست عضویت</button>
+      <p id="status"></p>
+    </form>
+  </section>
+  <section class="card qr">
+    <h3>QR Code عضویت</h3><p class="sub">با اسکن این کد مستقیماً وارد صفحه ثبت‌نام می‌شوید.</p>
+    <img alt="QR Code سایت" src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=<?= encodeURIComponent(appUrl) ?>">
+  </section>
+</div>
+<footer>انجمن علمی رباتیک دانشگاه ولی عصر (عج) رفسنجان</footer>
+<script>
+document.getElementById("joinForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  const form = e.currentTarget, btn = document.getElementById("submitBtn"), status = document.getElementById("status");
+  const data = Object.fromEntries(new FormData(form).entries());
+  btn.disabled = true; status.textContent = "در حال ثبت اطلاعات...";
+  google.script.run.withSuccessHandler(res=>{
+    status.textContent = res.message; form.reset(); btn.disabled = false;
+  }).withFailureHandler(err=>{
+    status.textContent = err.message || "خطا در ثبت اطلاعات"; btn.disabled = false;
+  }).saveRegistration(data);
+});
+</script>
+</body></html>

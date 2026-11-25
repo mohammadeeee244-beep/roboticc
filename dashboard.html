@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>داشبورد مدیریت</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#06111e;color:#edf8ff;font-family:Tahoma}.wrap{max-width:1200px;margin:auto;padding:24px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{color:#55ddff}
+button{border:0;border-radius:8px;padding:11px 15px;background:#087fca;color:#fff;cursor:pointer;margin:4px}
+.danger{background:#a83248}.stat,.tablebox{background:#0c1e31;border:1px solid #1b4d70;border-radius:14px;padding:18px;margin-top:18px}
+.stat strong{font-size:30px;color:#55ddff}input{padding:12px;background:#061321;color:white;border:1px solid #24577b;border-radius:8px;width:min(100%,350px);margin-top:15px}
+.tablebox{overflow:auto}table{width:100%;border-collapse:collapse;min-width:750px}th,td{padding:12px;border-bottom:1px solid #21415a;text-align:right}th{color:#62dfff}
+#msg{color:#ffadad}
+</style></head><body><div class="wrap">
+<header><div><h1>پنل مدیریت انجمن رباتیک</h1><p>مدیریت اعضای ثبت‌نام‌شده</p></div><div><button onclick="loadData()">بروزرسانی</button><button onclick="downloadCsv()">دانلود فایل Excel (CSV)</button><button class="danger" onclick="logout()">خروج</button></div></header>
+<div class="stat">تعداد کل ثبت‌نام‌ها: <strong id="total">۰</strong></div>
+<input id="search" placeholder="جستجو بر اساس نام، شماره همراه، رشته..." oninput="render()">
+<p id="msg"></p><div class="tablebox"><table><thead><tr><th>زمان</th><th>نام</th><th>نام خانوادگی</th><th>همراه</th><th>شماره دانشجویی</th><th>رشته</th><th>عملیات</th></tr></thead><tbody id="rows"></tbody></table></div>
+</div>
+<script>
+const token=sessionStorage.getItem("adminToken");let allRows=[];
+function invalid(){document.getElementById("msg").textContent="نشست مدیر معتبر نیست. دوباره وارد شوید.";setTimeout(()=>window.top.location.href="<?= appUrl ?>?page=admin",1200);}
+function loadData(){
+ if(!token){invalid();return;}document.getElementById("msg").textContent="در حال دریافت اطلاعات...";
+ google.script.run.withSuccessHandler(data=>{allRows=data.rows;document.getElementById("total").textContent=data.total;document.getElementById("msg").textContent="";render();})
+ .withFailureHandler(invalid).getRegistrations(token);
+}
+function render(){
+ const q=document.getElementById("search").value.trim().toLowerCase();
+ const filtered=allRows.filter(r=>[r.firstName,r.lastName,r.phone,r.studentId,r.major].join(" ").toLowerCase().includes(q));
+ document.getElementById("rows").innerHTML=filtered.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.firstName)}</td><td>${esc(r.lastName)}</td><td>${esc(r.phone)}</td><td>${esc(r.studentId)}</td><td>${esc(r.major)}</td><td><button class="danger" onclick="removeRow(${r.rowNumber})">حذف</button></td></tr>`).join("")||'<tr><td colspan="7">موردی پیدا نشد.</td></tr>';
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function removeRow(n){if(!confirm("این ثبت‌نام حذف شود؟"))return;google.script.run.withSuccessHandler(loadData).withFailureHandler(e=>alert(e.message)).deleteRegistration(token,n);}
+function downloadCsv(){
+ google.script.run.withSuccessHandler(b64=>{
+  const raw=atob(b64),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
+  const blob=new Blob([bytes],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="robotics_members.csv";a.click();URL.revokeObjectURL(a.href);
+ }).withFailureHandler(e=>alert(e.message)).exportRegistrationsCsv(token);
+}
+function logout(){google.script.run.withSuccessHandler(()=>{sessionStorage.removeItem("adminToken");window.top.location.href="<?= appUrl ?>?page=admin";}).logoutAdmin(token);}
+loadData();
+</script></body></html>
