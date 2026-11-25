@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>انجمن علمی رباتیک دانشگاه ولی‌عصر رفسنجان</title>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#07111f;--panel:#101f33;--blue:#24b8ff;--cyan:#61e5ff;--text:#edf8ff;--muted:#a9bfd2}
+    *{box-sizing:border-box} body{margin:0;font-family:Vazirmatn,Tahoma,sans-serif;background:radial-gradient(circle at 15% 10%,#12365a 0,transparent 32%),radial-gradient(circle at 90% 70%,#073e59 0,transparent 28%),var(--bg);color:var(--text);min-height:100vh}
+    .wrap{width:min(1050px,92%);margin:auto;padding:34px 0 50px}.top{text-align:center;margin-bottom:26px}
+    .badge{display:inline-block;border:1px solid #2aa9e566;background:#0d2944;padding:7px 18px;border-radius:30px;color:var(--cyan);font-size:13px}
+    h1{font-size:clamp(25px,5vw,42px);margin:16px 0 8px}.sub{color:var(--muted);margin:0}
+    .grid{display:grid;grid-template-columns:1.25fr .75fr;gap:22px;align-items:start}
+    .card{background:linear-gradient(145deg,#142941ee,#0c1929ee);border:1px solid #2b83b655;border-radius:24px;padding:26px;box-shadow:0 18px 55px #0006}
+    h2{margin:0 0 18px;font-size:21px;color:var(--cyan)}
+    .fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    label{display:block;font-size:13px;color:#c8dbea;margin-bottom:7px}
+    input,select{width:100%;border:1px solid #31516b;background:#081727;color:white;border-radius:12px;padding:13px;font:inherit;outline:none}
+    input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px #24b8ff22}
+    .full{grid-column:1/-1}.btn{border:0;border-radius:13px;padding:14px 20px;font:700 15px Vazirmatn;cursor:pointer;background:linear-gradient(90deg,#087bc5,#20c5ee);color:#001321;width:100%;margin-top:18px}
+    .btn:disabled{opacity:.6;cursor:wait}.msg{min-height:25px;text-align:center;margin:12px 0 0;font-size:14px}
+    .qrbox{text-align:center}.qrframe{display:inline-flex;padding:14px;background:white;border-radius:18px;margin:8px 0 14px;min-height:220px;min-width:220px;align-items:center;justify-content:center}
+    #qr{width:220px;height:220px;display:block}.hint{font-size:13px;color:var(--muted);line-height:2}.url{direction:ltr;word-break:break-all;font-size:11px;color:#83dfff;background:#071522;padding:9px;border-radius:9px;margin-top:12px}
+    footer{text-align:center;color:#7894aa;font-size:12px;margin-top:25px}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}.fields{grid-template-columns:1fr}.full{grid-column:auto}.card{padding:20px}.qrbox{order:-1}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="top">
+      <span class="badge">ROBOTICS ASSOCIATION · VRU</span>
+      <h1>انجمن علمی رباتیک دانشگاه ولی‌عصر (عج)</h1>
+      <p class="sub">فرم عضویت و ثبت‌نام علاقه‌مندان به دنیای رباتیک</p>
+    </header>
+
+    <section class="grid">
+      <div class="card">
+        <h2>فرم ثبت‌نام عضویت</h2>
+        <form id="registrationForm">
+          <div class="fields">
+            <div><label for="firstName">نام</label><input id="firstName" name="firstName" required maxlength="60" autocomplete="given-name"></div>
+            <div><label for="lastName">نام خانوادگی</label><input id="lastName" name="lastName" required maxlength="80" autocomplete="family-name"></div>
+            <div><label for="phone">شماره همراه</label><input id="phone" name="phone" required inputmode="numeric" pattern="09[0-9]{9}" placeholder="09123456789" maxlength="11"></div>
+            <div><label for="studentId">شماره دانشجویی</label><input id="studentId" name="studentId" required maxlength="30"></div>
+            <div class="full"><label for="major">رشته تحصیلی</label><input id="major" name="major" required maxlength="100" placeholder="مثلاً مهندسی کامپیوتر"></div>
+          </div>
+          <button class="btn" id="submitBtn" type="submit">ثبت اطلاعات</button>
+          <p class="msg" id="formMessage" role="status"></p>
+        </form>
+      </div>
+
+      <aside class="card qrbox">
+        <h2>ورود مستقیم به فرم ثبت‌نام</h2>
+        <div class="qrframe">
+          <img id="qr" alt="QR Code ورود به فرم ثبت‌نام">
+        </div>
+        <p class="hint">این کد را اسکن کنید تا مستقیماً همین صفحه ثبت‌نام انجمن باز شود.</p>
+        <div class="url" id="targetAddress"></div>
+      </aside>
+    </section>
+    <footer>انجمن علمی رباتیک · دانشگاه ولی‌عصر (عج) رفسنجان</footer>
+  </main>
+
+ <script>
+    // آدرس سایت گیت‌هاب
+    const githubUrl = "https://mohammadeeee244-beep.github.io/roboticc/";
+
+    // ساخت QR Code
+    document.getElementById('qr').src =
+      'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=10&data=' +
+      encodeURIComponent(githubUrl);
+
+    document.getElementById('targetAddress').textContent = githubUrl;
+
+    // ثبت اطلاعات فرم
+    document.getElementById('registrationForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const form = event.currentTarget;
+      if (!form.reportValidity()) return;
+
+      const data = {
+        firstName: form.firstName.value.trim(),
+        lastName: form.lastName.value.trim(),
+        phone: form.phone.value.trim(),
+        studentId: form.studentId.value.trim(),
+        major: form.major.value.trim()
+      };
+
+      const button = document.getElementById('submitBtn');
+      const message = document.getElementById('formMessage');
+      button.disabled = true;
+      button.textContent = 'در حال ثبت اطلاعات...';
+      message.textContent = '';
+
+      fetch("https://script.google.com/macros/s/AKfycbxUkefFq4AK-kpnABgAKeJwyz1RrXnEDE5baKDJoiwZ8p2c5r5JinDQQU3raVfdomTjvQ/exec", {
+  method: "POST",
+  mode: "no-cors",
+  headers: {
+    "Content-Type": "text/plain;charset=utf-8"
+  },
+  body: JSON.stringify(data)
+});
+
+message.textContent = "Registration submitted!";
+message.style.color = "#72f0b0";
+
+form.reset();
+button.disabled = false;
+button.textContent = "Submit";
+        withFailureHandler(function(error) {
+          message.textContent = (error && error.message) || 'ثبت اطلاعات انجام نشد. دوباره تلاش کنید.';
+          message.style.color = '#ff9a9a';
+          button.disabled = false;
+          button.textContent = 'ثبت اطلاعات';
+        })
+        .saveRegistration(data);
+    });
+</script>
+</body>
+</html>
